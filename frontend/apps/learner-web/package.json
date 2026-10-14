@@ -1,0 +1,9 @@
+{
+  "name": "@sprint-story/learner-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "dev": "vite --host 0.0.0.0", "build": "tsc -b && vite build", "typecheck": "tsc --noEmit -p tsconfig.app.json", "test": "vitest run" },
+  "dependencies": { "@sprint-story/ui-sprout": "workspace:*", "@vitejs/plugin-react": "^5.0.4", "vite": "^7.1.12", "react": "^18.3.1", "react-dom": "^18.3.1", "@sprint-story/content-schema": "workspace:*", "@sprint-story/engine": "workspace:*" },
+  "devDependencies": { "@types/react": "^18.3.18", "@types/react-dom": "^18.3.5", "typescript": "^5.9.3", "vitest": "^4.0.8" }
+}

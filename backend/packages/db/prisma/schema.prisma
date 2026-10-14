@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../apps/api/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RevisionStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  RETIRED
+}
+
+enum ProgressEventKind {
+  ANSWER_GRADED
+  MISSION_COMPLETED
+  GAME_COMPLETED
+  CHEST_CLAIMED
+}
+
+model Exam {
+  id            String     @id
+  currentPackId String?    @unique @db.Uuid
+  packs         ExamPack[] @relation("ExamReleases")
+  currentPack   ExamPack?  @relation("ActiveExamPack", fields: [currentPackId], references: [id], onDelete: SetNull)
+  chapters      Chapter[]
+}
+
+model Learner {
+  id             String          @id @default(uuid()) @db.Uuid
+  authSubject    String?         @unique
+  epoch          Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  events         ProgressEvent[]
+  state          LearnerState?
+}
+
+model Chapter {
+  id          String           @id
+  examId      String
+  title       String
+  exam        Exam             @relation(fields: [examId], references: [id], onDelete: Restrict)
+  revisions   ChapterRevision[]
+  createdAt   DateTime         @default(now())
+}
+
+model ChapterRevision {
+  id          String         @id @default(uuid()) @db.Uuid
+  chapterId   String
+  version     Int
+  status      RevisionStatus @default(DRAFT)
+  authorId    String
+  content     Json
+  contentHash String?
+  createdAt   DateTime       @default(now())
+  publishedAt DateTime?
+  chapter     Chapter        @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+  progressEvents ProgressEvent[]
+
+  @@unique([chapterId, version])
+  @@index([chapterId, status])
+}
+
+model ExamPack {
+  id          String   @id @default(uuid()) @db.Uuid
+  examId      String
+  version     Int
+  contentHash String
+  content     Json
+  publishedAt DateTime @default(now())
+  exam        Exam     @relation("ExamReleases", fields: [examId], references: [id], onDelete: Restrict)
+  activeFor   Exam?    @relation("ActiveExamPack")
+
+  @@unique([examId, version])
+  @@unique([examId, contentHash])
+}
+
+model ProgressEvent {
+  id                String            @id @default(uuid()) @db.Uuid
+  learnerId         String            @db.Uuid
+  clientEventId     String            @db.Uuid
+  dedupeKey         String?
+  epoch             Int
+  serverSequence    BigInt?
+  kind              ProgressEventKind
+  sessionId         String?           @db.Uuid
+  itemId            String?
+  chapterRevisionId String?           @db.Uuid
+  occurredAt        DateTime
+  payload           Json
+  acceptedAt        DateTime          @default(now())
+  learner           Learner           @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  chapterRevision   ChapterRevision?  @relation(fields: [chapterRevisionId], references: [id], onDelete: Restrict)
+
+  @@unique([learnerId, clientEventId])
+  @@unique([learnerId, epoch, dedupeKey])
+  @@unique([learnerId, serverSequence])
+  @@index([learnerId, epoch, acceptedAt])
+}
+
+model LearnerState {
+  learnerId String   @id @db.Uuid
+  epoch     Int      @default(0)
+  sequence  BigInt   @default(0)
+  state     Json
+  updatedAt DateTime @updatedAt
+  learner   Learner  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String
+  action     String
+  targetType String
+  targetId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId, createdAt])
+}

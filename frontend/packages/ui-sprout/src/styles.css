@@ -1,0 +1,20 @@
+@import './tokens.css';
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--surface-page); }
+body { margin: 0; color: var(--ink); font: 500 16px/1.5 var(--font-body); }
+button, input { font: inherit; }
+button { color: inherit; }
+.ss-button { min-height: var(--tap-min); padding: 0 16px; border: 0; border-radius: 14px; font-weight: 850; cursor: pointer; }
+.ss-button--primary { color: var(--ink-inverse); background: var(--grape); box-shadow: 0 4px 0 var(--grape-deep); }
+.ss-button--secondary { color: var(--grape); background: var(--grape-100); }
+.ss-button--quiet { color: var(--ink-muted); background: transparent; }
+.ss-button:disabled { color: var(--ink-muted); background: var(--surface-sunk); box-shadow: none; cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+::selection { background: var(--grape-100); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

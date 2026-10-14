@@ -1,0 +1,23 @@
+{
+  "name": "sprint-story",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@12.5.1",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev:api": "pnpm --filter @sprint-story/api start:dev",
+    "dev:learner": "pnpm --filter @sprint-story/learner-web dev",
+    "dev:studio": "pnpm --filter @sprint-story/studio-web dev",
+    "build:web": "GITHUB_PAGES=true pnpm --filter @sprint-story/learner-web build && GITHUB_PAGES=true pnpm --filter @sprint-story/studio-web build",
+    "build": "pnpm --filter @sprint-story/engine build && pnpm --filter @sprint-story/ui-sprout build && pnpm --filter @sprint-story/learner-web build && pnpm --filter @sprint-story/studio-web build && pnpm --filter @sprint-story/api build",
+    "typecheck": "pnpm --filter @sprint-story/engine typecheck && pnpm --filter @sprint-story/content-schema typecheck && pnpm --filter @sprint-story/ui-sprout typecheck && pnpm --filter @sprint-story/learner-web typecheck && pnpm --filter @sprint-story/studio-web typecheck && pnpm --filter @sprint-story/api typecheck",
+    "test": "pnpm --filter @sprint-story/engine test && pnpm --filter @sprint-story/content-schema test && pnpm --filter @sprint-story/ui-sprout test && pnpm --filter @sprint-story/learner-web test && pnpm --filter @sprint-story/studio-web test && pnpm --filter @sprint-story/api test",
+    "db:generate": "pnpm --filter @sprint-story/db exec prisma generate --schema prisma/schema.prisma",
+    "db:migrate": "pnpm --filter @sprint-story/db migrate",
+    "db:migrate:dev": "pnpm --filter @sprint-story/db migrate:dev",
+    "db:studio": "pnpm --filter @sprint-story/db studio"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^11.0.0"
+  }
+}
